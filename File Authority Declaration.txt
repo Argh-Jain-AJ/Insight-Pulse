@@ -1,0 +1,20 @@
+The following files have specific authority levels:
+
+AUTHORITATIVE (must not be violated):
+- Insight Pulse - Product Requirement.txt
+- General Insights Agent Pipeline.txt
+- Competitor & Product Context Pipeline.txt
+
+EXECUTION ORDER REFERENCE:
+- FINAL IMPLEMENTATION STEPS.txt
+
+EXECUTABLE SUPPORT CODE:
+- data_agent1 (1).py
+
+Rules:
+- PRD defines WHAT the system must do
+- Pipeline specs define HOW reasoning is allowed
+- Final Implementation Steps define WHEN things are built
+- The data agent emits facts only and must not reason
+
+Confirm you will treat these roles as fixed.

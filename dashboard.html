@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insight Pulse - Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="dashboard-body">
+
+    <div class="dashboard-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M16 2L16 30" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        <path d="M2 16H30" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        <circle cx="16" cy="16" r="6" stroke="currentColor" stroke-width="2" fill="none" />
+                    </svg>
+                    <span>Insight Pulse</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="#" class="active"><span class="icon">📊</span> Dashboard</a></li>
+                    <li><a href="#"><span class="icon">🕵️</span> Competitor Tracker</a></li>
+                    <li><a href="#"><span class="icon">💊</span> Product Tracker</a></li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="avatar">JD</div>
+                    <div class="user-info">
+                        <span class="user-name">John Doe</span>
+                        <span class="user-org">Acme Pharma</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-bar">
+                <div>
+                    <h1>Dashboard</h1>
+                    <p class="subtitle">A continuously updated view of your market and competitive landscape</p>
+                </div>
+                <!-- Optional: Date or Global Filter could go here -->
+            </header>
+
+            <div class="content-grid">
+
+                <!-- SECTION 1: RECENT MARKET ACTIVITY -->
+                <section class="dashboard-section recent-activity">
+                    <h2>Recent Market Activity</h2>
+                    <div class="activity-list">
+                        <!-- Item 1 -->
+                        <div class="activity-item">
+                            <div class="activity-meta">
+                                <span class="tag severity-high">High</span>
+                                <span class="tag velocity-new">New</span>
+                                <span class="timestamp">3 hours ago</span>
+                            </div>
+                            <div class="activity-content">
+                                <h3>Launch: Competitor X releases BioSim-Alpha</h3>
+                                <p>Major competitor launched biosimilar in EU markets with aggressive pricing strategy
+                                    (-15% vs benchmark).</p>
+                                <span class="activity-type">Launch Activity</span>
+                            </div>
+                        </div>
+
+                        <!-- Item 2 -->
+                        <div class="activity-item">
+                            <div class="activity-meta">
+                                <span class="tag severity-notable">Notable</span>
+                                <span class="tag velocity-increasing">Increasing</span>
+                                <span class="timestamp">5 hours ago</span>
+                            </div>
+                            <div class="activity-content">
+                                <h3>Regulatory: FDA Advisory Committee Meeting Announced</h3>
+                                <p>FDA scheduled meeting to discuss new safety guidelines for JAK inhibitors, impacting
+                                    your pipeline asset.</p>
+                                <span class="activity-type">Regulatory</span>
+                            </div>
+                        </div>
+
+                        <!-- Item 3 -->
+                        <div class="activity-item">
+                            <div class="activity-meta">
+                                <span class="tag severity-low">Low</span>
+                                <span class="timestamp">8 hours ago</span>
+                            </div>
+                            <div class="activity-content">
+                                <h3>Communication: Key Opinion Leader (KOL) Webinar</h3>
+                                <p>Dr. Smith hosted a webinar discussing emerging trends in oncology biomarkers.</p>
+                                <span class="activity-type">Communication</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTION 2: GENERAL INSIGHTS -->
+                <section class="dashboard-section general-insights">
+                    <h2>General Insights</h2>
+                    <div class="insights-grid">
+
+                        <!-- 3.1 Theme Insights -->
+                        <div class="insight-column">
+                            <div class="column-header">
+                                <h3>Theme Insights</h3>
+                                <span class="icon">🌍</span>
+                            </div>
+                            <div class="card insight-card">
+                                <h4>Shift to Oral-First Therapies</h4>
+                                <p>Market preference is notably shifting towards oral formulations for maintenance
+                                    therapy, moving away from IV.</p>
+                                <div class="card-meta">
+                                    <span class="tag severity-notable">Notable</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3.2 GTM Insights -->
+                        <div class="insight-column">
+                            <div class="column-header">
+                                <h3>GTM Insights</h3>
+                                <span class="icon">🚀</span>
+                            </div>
+                            <div class="card insight-card">
+                                <h4>Digital-First Engagement</h4>
+                                <p>Competitor Z has reduced field force by 20% in favor of a new digital engagement
+                                    platform for HCPs.</p>
+                                <div class="card-meta">
+                                    <span class="tag severity-low">Low</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3.3 Positioning Insights -->
+                        <div class="insight-column">
+                            <div class="column-header">
+                                <h3>Positioning Insights</h3>
+                                <span class="icon">🎯</span>
+                            </div>
+                            <div class="card insight-card">
+                                <h4>"Best-in-Class" Safety Claims</h4>
+                                <p>New messaging from Competitor A emphasizes safety profile over efficacy in their
+                                    latest campaign materials.</p>
+                                <div class="card-meta">
+                                    <span class="tag severity-high">High</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- SECTION 3: ROLLING PULSE -->
+                <section class="dashboard-section rolling-pulse">
+                    <h2>Rolling Pulse</h2>
+                    <p class="section-desc">Accumulated insights over the last 14 days</p>
+                    <div class="pulse-grid">
+                        <div class="card pulse-card">
+                            <div class="card-header">
+                                <span class="tag severity-notable">Notable</span>
+                                <span class="time-window">Last 10 days</span>
+                            </div>
+                            <h3>Emerging Pricing Pressure in APAC</h3>
+                            <p>Multiple regional players have lowered bidding prices for tender contracts in Vietnam and
+                                Thailand, signaling a shift in competitive dynamics.</p>
+                        </div>
+
+                        <div class="card pulse-card">
+                            <div class="card-header">
+                                <span class="tag severity-high">High</span>
+                                <span class="tag velocity-increasing">Velocity High</span>
+                                <span class="time-window">Last 7 days</span>
+                            </div>
+                            <h3>Competitor Clinical Trial Acceleration</h3>
+                            <p>Competitor Y has recruited 50% faster than anticipated for their Phase III trial,
+                                potentially pulling forward their readout date by Q4.</p>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+</body>
+
+</html>

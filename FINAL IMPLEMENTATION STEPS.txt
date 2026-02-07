@@ -1,0 +1,528 @@
+FINAL IMPLEMENTATION STEPS 
+
+## **YOUR STARTING POSITION**
+
+You have:
+- ✅ Data ingestion working (4 APIs)
+- ✅ Signal normalization done
+- ✅ LangGraph-compatible state structure
+
+You need:
+- ❌ Event storage
+- ❌ Insight orchestrator
+- ❌ Category assignment
+- ❌ Backend API
+- ❌ Frontend UI
+
+---
+
+## **PHASE 1: DATABASE FOUNDATION (1 hour)**
+
+### **Step 1: Create SQLite Database Schema (20 min)**
+
+Create 6 tables:
+1. **tenants** - just id and name
+2. **competitors** - id, tenant_id, name
+3. **products** - id, tenant_id, name  
+4. **events** - id, tenant_id, source, raw_json, timestamp, processed_flag
+5. **insights** - id, tenant_id, scope, severity, velocity, explanation, category (nullable), created_at
+6. **context_blocks** - id, insight_id, focal_entity_id, focal_entity_type, framing_text
+
+**Critical:** category field in insights table must allow NULL values
+
+### **Step 2: Seed Initial Data (20 min)**
+
+Manually insert:
+- 1 tenant: "Acme Pharma"
+- 3 competitors: "Pfizer", "Moderna", "Johnson & Johnson"
+- 2 products: "OncologyDrug-X", "CardioDrug-Y"
+
+### **Step 3: Write Event Storage Function (20 min)**
+
+Create function that takes your data_agent output and:
+- Loops through each signal
+- Extracts the original API response data
+- Stores it as a raw Event in events table
+- Marks processed_flag as False
+- Returns list of event IDs
+
+**Purpose:** Preserve traceability for explainability
+
+---
+
+## **PHASE 2: TENANT SCOPING FILTER (30 min)**
+
+### **Step 4: Build Relevance Filter (30 min)**
+
+Create function that:
+- Takes list of signals from your data_agent
+- Takes tenant configuration (competitors list, products list)
+- Checks each signal's company_mentions field
+- Checks each signal's drug_mentions field
+- Keeps signal if it mentions any tracked competitor
+- Keeps signal if it mentions any tracked product
+- Keeps signal if source_type is "regulatory" (always relevant)
+- Returns filtered list of relevant signals only
+
+**Purpose:** Prevent insights about irrelevant companies
+
+---
+
+## **PHASE 3: LOCAL LLM SETUP (30 min)**
+
+### **Step 5: Install and Test Ollama (15 min)**
+
+- Install Ollama on your laptop
+- Pull model: qwen2.5:3b (good balance of speed and quality)
+- Test it responds to a simple prompt
+- Verify JSON output mode works
+
+**Alternative if 3b is too slow:** Use qwen2.5:1.5b
+
+### **Step 6: Test LangChain Integration (15 min)**
+
+- Install langchain-community package
+- Create simple test that calls Ollama through LangChain
+- Verify structured output (JSON parsing)
+- Test timeout behavior (set 30 second timeout)
+
+**Purpose:** Catch integration issues before building orchestrator
+
+---
+
+## **PHASE 4: MAIN INSIGHT ORCHESTRATOR (2 hours)**
+
+### **Step 7: Design Orchestrator Prompt Template (30 min)**
+
+Write prompt that includes:
+- Role definition: "You are the Main Insight Orchestrator"
+- Explicit rules: "Do NOT assign categories", "Do NOT make recommendations"
+- Input structure: tenant name, competitors list, products list, signals
+- Output structure: JSON array with scope, severity, velocity, explanation fields
+- 3-5 example inputs and outputs (few-shot learning)
+
+**Test prompt manually** in Ollama CLI before coding
+
+### **Step 8: Build LangGraph State Schema (20 min)**
+
+Define state dictionary with fields:
+- signals (list)
+- tenant_context (dict with tenant name, competitors, products)
+- candidate_insights (list, starts empty)
+- errors (list for debugging)
+
+### **Step 9: Create Single Orchestrator Node (40 min)**
+
+Build function that:
+- Takes state as input
+- Formats signals into readable text for LLM
+- Constructs prompt with tenant context
+- Calls Ollama model with temperature=0.1 (low randomness)
+- Parses JSON response
+- Handles malformed JSON (retry once with clearer instructions)
+- Converts JSON to Insight objects
+- Updates state with candidate_insights
+- Returns updated state
+
+### **Step 10: Build and Test Graph (30 min)**
+
+Create LangGraph:
+- Add single node: "synthesize_insights"
+- Set as entry point
+- Set as finish point
+- Compile graph
+- Test with your actual signals from data_agent
+- Verify it produces 2-5 insights from your test data
+- Check insights have correct fields and NO category field set
+
+---
+
+## **PHASE 5: LENS AGENTS (1.5 hours)**
+
+### **Step 11: Create Theme Lens Prompt (15 min)**
+
+Write prompt that:
+- Explains what "Theme" means: market-wide patterns, regulatory shifts, sector trends
+- Asks: "Is this insight primarily about Theme-level changes?"
+- Requests: confidence score between 0 and 1
+- Requests: brief rationale
+- Includes 2-3 examples of Theme vs non-Theme insights
+
+### **Step 12: Build Theme Lens Function (15 min)**
+
+Create function that:
+- Takes one Insight object
+- Calls Ollama with Theme prompt
+- Parses response to extract confidence float
+- Returns just the confidence number (0.0 to 1.0)
+- Has error handling (if parse fails, return 0.0)
+
+### **Step 13: Create GTM Lens Prompt (15 min)**
+
+Write prompt for GTM (Go-To-Market):
+- Explains GTM means: pricing, channels, sales models, market access, distribution
+- Same structure as Theme prompt
+- Different examples showing GTM characteristics
+
+### **Step 14: Build GTM Lens Function (15 min)**
+
+Same structure as Theme lens, different prompt
+
+### **Step 15: Create Positioning Lens Prompt (15 min)**
+
+Write prompt for Positioning:
+- Explains Positioning means: messaging, differentiation, target segments, brand positioning
+- Same structure
+- Different examples
+
+### **Step 16: Build Positioning Lens Function (15 min)**
+
+Same structure as Theme lens, different prompt
+
+### **Step 17: Create Category Gate Logic (15 min)**
+
+Build function that:
+- Takes one Insight and runs all three lenses
+- Collects three confidence scores
+- Finds maximum confidence score
+- If max confidence >= 0.7: assigns corresponding category to insight
+- If max confidence < 0.7: leaves insight.category as None
+- Returns updated Insight object
+
+**Critical:** This is where category gets assigned, NOT in the lenses
+
+---
+
+## **PHASE 6: CONTEXT PIPELINE (45 min)**
+
+### **Step 18: Create Competitor Context Function (20 min)**
+
+Build function that:
+- Takes list of Insights
+- Takes competitor_id
+- Filters insights where scope is "competitor" OR "market"
+- For each relevant insight, creates InsightContextBlock with:
+  - Reference to insight_id
+  - focal_entity_id = competitor_id
+  - focal_entity_type = "competitor"
+  - framing_text = simple template like "This affects [competitor_name] because it changes their competitive position in [explanation summary]"
+- Returns list of context blocks
+
+**Use simple string templates**, no LLM needed
+
+### **Step 19: Create Product Context Function (20 min)**
+
+Same as competitor function but:
+- Filters where scope is "product" OR "market"
+- focal_entity_type = "product"
+- framing_text = "This impacts [product_name] through market exposure to [explanation summary]"
+
+### **Step 20: Store Context Blocks (5 min)**
+
+Create function that inserts context blocks into database
+
+---
+
+## **PHASE 7: BACKEND API (2 hours)**
+
+### **Step 21: Setup FastAPI Project (15 min)**
+
+- Install FastAPI and uvicorn
+- Create main.py file
+- Add CORS middleware (allow localhost:3000)
+- Create database connection helper
+- Test server starts without errors
+
+### **Step 22: Build Processing Endpoint (30 min)**
+
+Create POST /api/process endpoint that:
+1. Gets unprocessed events from database (or triggers data_agent to fetch new)
+2. Runs your data_agent function
+3. Stores results as Events
+4. Applies tenant scoping filter
+5. Runs orchestrator graph on filtered signals
+6. Runs category gate on each insight
+7. Stores insights in database
+8. Generates context blocks for all competitors and products
+9. Stores context blocks
+10. Returns count of insights created
+
+**This is your pipeline trigger**
+
+### **Step 23: Build Dashboard Endpoint (20 min)**
+
+Create GET /api/dashboard that:
+- Queries all insights from last 30 days
+- Separates into 4 groups:
+  - recent_activity: severity="high" OR velocity="fast" (regardless of category)
+  - theme_insights: category="Theme"
+  - gtm_insights: category="GTM"
+  - positioning_insights: category="Positioning"
+- Returns JSON with all 4 lists
+
+**Critical check:** Uncategorized high-severity insights must appear in recent_activity
+
+### **Step 24: Build Competitor List Endpoint (15 min)**
+
+Create GET /api/competitors that:
+- Gets all competitors for tenant
+- For each competitor, counts context_blocks where focal_entity_id=competitor.id
+- Returns list with competitor name and update_count
+
+### **Step 25: Build Competitor Detail Endpoint (20 min)**
+
+Create GET /api/competitors/{competitor_id} that:
+- Gets all context_blocks for this competitor
+- For each context_block, fetches the linked insight
+- Groups by insight.category (Theme, GTM, Positioning, None)
+- Returns nested structure with categories and insights
+
+### **Step 26: Build Product Endpoints (20 min)**
+
+Create GET /api/products (list view) - same logic as competitor list
+Create GET /api/products/{product_id} (detail view) - same logic as competitor detail
+
+### **Step 27: Test All Endpoints (20 min)**
+
+- Use curl or Postman
+- Trigger POST /api/process
+- Verify insights are created
+- Check each GET endpoint returns data
+- Verify high-severity uncategorized insight appears in dashboard recent_activity
+- Verify categorized insights appear in correct sections
+
+---
+
+## **PHASE 8: FRONTEND (3 hours)**
+
+### **Step 28: Setup Next.js Project (15 min)**
+
+- Create Next.js app with TypeScript and Tailwind
+- Test it runs on localhost:3000
+- Clear out default content
+
+### **Step 29: Create Layout with Sidebar (20 min)**
+
+Build app/layout.tsx with:
+- Sidebar navigation on left
+- Three links: Dashboard, Competitor Tracker, Product Tracker
+- Main content area on right
+- Use Tailwind for basic styling (flex layout)
+
+### **Step 30: Create Shared Components (30 min)**
+
+Build reusable components:
+
+**InsightCard component:**
+- Shows insight explanation
+- Shows severity badge (color: red=high, yellow=medium, green=low)
+- Shows velocity indicator
+- Shows timestamp
+- Takes insight object as prop
+
+**EntityCard component:**
+- Shows entity name (competitor or product)
+- Shows update count badge
+- Clickable to navigate to detail page
+- Takes entity object as prop
+
+### **Step 31: Build Dashboard Page (45 min)**
+
+Create app/dashboard/page.tsx:
+- Fetches data from GET /api/dashboard on load
+- Displays page title "Market Intelligence Dashboard"
+- Section 1: "Recent Market Activity" - maps over recent_activity array with InsightCard
+- Section 2: Three-column grid below:
+  - Column 1: "Theme Insights" - maps over theme_insights
+  - Column 2: "GTM Insights" - maps over gtm_insights  
+  - Column 3: "Positioning Insights" - maps over positioning_insights
+- Use Tailwind grid classes for layout
+- Handle loading state
+- Handle empty states (no insights message)
+
+### **Step 32: Build Competitor List Page (20 min)**
+
+Create app/competitors/page.tsx:
+- Fetches from GET /api/competitors
+- Shows page title "Competitor Tracker"
+- Maps over competitors array with EntityCard
+- Each card links to /competitors/{id}
+
+### **Step 33: Build Competitor Detail Page (30 min)**
+
+Create app/competitors/[id]/page.tsx:
+- Gets competitor_id from URL params
+- Fetches from GET /api/competitors/{competitor_id}
+- Shows competitor name as header
+- Shows 4 sections: Theme, GTM, Positioning, Uncategorized
+- Each section maps over insights with InsightCard
+- Shows context framing text below each insight
+- If section is empty, shows "No insights in this category"
+
+### **Step 34: Build Product List Page (20 min)**
+
+Create app/products/page.tsx:
+- Same structure as competitor list
+- Fetches from GET /api/products
+- Links to /products/{id}
+
+### **Step 35: Build Product Detail Page (30 min)**
+
+Create app/products/[id]/page.tsx:
+- Same structure as competitor detail
+- Fetches from GET /api/products/{product_id}
+
+### **Step 36: Add Basic Styling (20 min)**
+
+- Make severity badges colorful
+- Add spacing between cards
+- Add hover effects on clickable items
+- Ensure responsive layout works
+- Add loading spinners
+
+**Keep it functional, not beautiful** - time constraint
+
+---
+
+## **PHASE 9: INTEGRATION & TESTING (1 hour)**
+
+### **Step 37: End-to-End Test Flow (30 min)**
+
+1. Start backend server
+2. Start frontend server
+3. Trigger POST /api/process (can use curl or build a button in frontend)
+4. Wait for processing to complete
+5. Navigate to Dashboard - verify insights appear
+6. Check Recent Market Activity has items
+7. Check Theme/GTM/Positioning sections have items
+8. Navigate to Competitor Tracker - verify competitors show update counts
+9. Click a competitor - verify detail page shows grouped insights
+10. Navigate to Product Tracker - repeat verification
+
+### **Step 38: Test Critical Edge Case (15 min)**
+
+Create or find a high-severity insight that gets low confidence from all lenses:
+- Verify it appears in Recent Market Activity
+- Verify it does NOT appear in Theme/GTM/Positioning sections
+- This proves your category gate logic works
+
+**If this fails, your implementation violates PRD**
+
+### **Step 39: Test Data Consistency (15 min)**
+
+Find one specific insight:
+- Note its explanation text on Dashboard
+- Find it in Competitor detail view
+- Verify explanation is EXACTLY the same (single source of truth)
+- Verify severity and velocity are identical
+- Context framing text should be different (entity-specific)
+
+**This proves you preserved insight immutability**
+
+---
+
+## **PHASE 10: DEMO PREPARATION (30 min)**
+
+### **Step 40: Create Demo Scenarios (15 min)**
+
+Prepare 2-3 compelling stories:
+
+**Scenario 1:** "High-severity regulatory change"
+- FDA announces new safety requirements
+- Creates high-severity, Theme insight
+- Shows up in Recent Activity
+- Affects multiple competitors
+
+**Scenario 2:** "Competitor pricing shift"  
+- Pfizer reduces drug price by 20%
+- Creates high-severity, GTM insight
+- Shows in Recent Activity AND GTM section
+- Visible in Pfizer detail page
+
+**Scenario 3:** "Ambiguous patent filing"
+- USPTO patent but unclear strategic intent
+- High severity but low lens confidence
+- Should appear ONLY in Recent Activity
+- This proves edge case handling
+
+### **Step 41: Prepare Talking Points (15 min)**
+
+Write down 5 key points to demonstrate:
+
+1. **Single Source of Truth**
+   - "Notice this insight appears in multiple views but the text is identical - it's the same canonical insight, just with different context framing"
+
+2. **Category Confidence Gate**
+   - "This regulatory change has high severity but our system couldn't confidently categorize it, so it only appears in Recent Activity - we don't force classification"
+
+3. **Entity-Specific Context**
+   - "The same market insight appears for both Pfizer and Moderna, but the framing explains why it matters to each specifically"
+
+4. **Velocity and Severity Independence**
+   - "These two insights have the same severity but different velocities - the system tracks both momentum and impact separately"
+
+5. **Architectural Boundaries**
+   - "The orchestrator created this insight, the lenses evaluated it, and the gate assigned the category only when confidence was high enough - three separate responsibilities"
+
+---
+
+## **TIMELINE SUMMARY**
+
+**Phase 1:** Database (1 hour)
+**Phase 2:** Tenant Scoping (30 min)
+**Phase 3:** LLM Setup (30 min)
+**Phase 4:** Orchestrator (2 hours)
+**Phase 5:** Lenses (1.5 hours)
+**Phase 6:** Context Pipeline (45 min)
+**Phase 7:** Backend API (2 hours)
+**Phase 8:** Frontend (3 hours)
+**Phase 9:** Testing (1 hour)
+**Phase 10:** Demo Prep (30 min)
+
+**Total: ~12.75 hours**
+
+**But you have head start with data ingestion, so realistic: ~9-10 hours**
+
+---
+
+## **CRITICAL SUCCESS CRITERIA**
+
+Before calling it done, verify:
+
+- [ ] High-severity uncategorized insights appear in Recent Activity
+- [ ] Categorized insights appear in correct sections  
+- [ ] Same insight text across all views (immutability)
+- [ ] Lenses return confidence only (not category names)
+- [ ] Category assigned by gate, not lenses
+- [ ] Events stored for traceability
+- [ ] Tenant scoping filters irrelevant signals
+- [ ] Context framing is entity-specific
+- [ ] Local LLM works offline (no API dependency)
+- [ ] All three pages render (Dashboard, Competitors, Products)
+
+---
+
+## **IF YOU RUN OUT OF TIME**
+
+**Priority 1 (Must Have):**
+- Orchestrator working
+- Category gate logic
+- Dashboard page with Recent Activity
+- One edge case test (uncategorized insight)
+
+**Priority 2 (Should Have):**
+- All three lenses
+- Competitor Tracker
+- Product Tracker
+- Full API
+
+**Priority 3 (Nice to Have):**
+- Context framing variations
+- Polished UI
+- Multiple demo scenarios
+
+**Minimum viable demo:** Orchestrator + Dashboard + Edge case test = 5 hours
+
+---
+
+**Now execute. Go build it. Good luck!**

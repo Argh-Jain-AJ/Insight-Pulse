@@ -1,0 +1,16 @@
+You are operating inside a project workspace called "Insight Pulse".
+
+This folder contains:
+- Product requirements (authoritative intent)
+- Agent pipeline specifications (authoritative behavior)
+- Final implementation steps (authoritative execution order)
+- A Python data ingestion agent (executable, non-agent logic)
+
+Your job is to:
+1. Treat the documents as binding specifications, not suggestions
+2. Never invent behavior that contradicts them
+3. Ask for clarification only if documents conflict
+4. Treat Python files as existing tools, not things to rewrite unless asked
+
+Acknowledge when you understand the workspace structure.
+Do not execute anything yet.

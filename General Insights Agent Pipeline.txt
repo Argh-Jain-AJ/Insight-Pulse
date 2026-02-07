@@ -1,0 +1,388 @@
+General Insights Agent Pipeline — Technical Design Specification
+
+
+# Insight Pulse
+
+## General Insights Agent Pipeline — Technical Design Specification
+
+---
+
+## 1. Purpose and Scope
+
+This document specifies the **agent-based insight generation pipeline** used to power **General Insights** and **Recent Market Activity** in Insight Pulse.
+
+It defines:
+
+* Agent responsibilities and boundaries
+* Data flow and decision points
+* Categorization behavior, including ambiguity handling
+* Presentation eligibility rules
+* Edge case handling required by the PRD
+
+This document **does not** define UI layout, storage schema, or model selection.
+
+---
+
+## 2. Design Goals (Derived from PRD)
+
+The pipeline must:
+
+1. Surface **meaningful change**, not raw data
+2. Preserve **explainability and temporal integrity**
+3. Avoid **forced or speculative categorization**
+4. Ensure **high-severity / high-velocity insights are never suppressed**
+5. Maintain **consistency across all views**
+
+---
+
+## 3. Conceptual Model (Authoritative)
+
+### 3.1 Fundamental Units
+
+* **Event**
+  A discrete, factual occurrence (never shown to users)
+
+* **Signal**
+  An interpreted indication derived from one or more events
+
+* **Insight**
+  A synthesized interpretation of one or more signals, enriched with:
+
+  * Scope
+  * Time window
+  * Severity
+  * Velocity
+  * Explanation
+
+Only **Insights** are user-visible.
+
+---
+
+## 4. High-Level Pipeline Overview
+
+```
+Events
+  ↓
+Signal Normalization (non-agent)
+  ↓
+Main Insight Orchestrator (synthesis)
+  ↓
+Lens Agents (interpretation)
+  ↓
+Category Confidence Check
+  ↓
+Final Insight
+  ↓
+Presentation Filters
+```
+
+---
+
+## 5. Pipeline Components
+
+---
+
+## 5.1 Event → Signal Normalization (Non-Agent Layer)
+
+### Responsibilities
+
+* Deduplicate events
+* Infer signal types
+* Enforce tenant scope
+* Group signals temporally
+
+### Constraints
+
+* No severity assignment
+* No categorization
+* No insight creation
+
+This layer exists to prevent agents from reasoning over noise.
+
+---
+
+## 5.2 Main Insight Orchestrator (Primary Authority)
+
+### Role
+
+The **only component allowed to create and finalize Insights**.
+
+### Responsibilities
+
+* Decide whether signals constitute an Insight
+* Assign:
+
+  * Scope (product / competitor / market)
+  * Time window
+  * Severity
+  * Velocity
+* Maintain historical continuity
+* Generate the canonical explanation
+
+### Output
+
+A **Candidate Insight Context**:
+
+```
+- Scope
+- Time window
+- Severity
+- Velocity
+- Explanation (draft)
+```
+
+No category is assigned at this stage.
+
+---
+
+## 5.3 Lens Agents (Interpretive, Non-Authoritative)
+
+Lens agents **do not generate insights**.
+They provide **interpretive input** only.
+
+All lens outputs are advisory.
+
+---
+
+### 5.3.1 Theme / Sector Lens Agent
+
+**Purpose**
+
+* Detect market-wide or structural patterns
+* Apply adjacency logic
+* Handle non-competitor market signals
+
+**Output**
+
+```
+- Relevance strength
+- Confidence score
+- Explicit adjacency dimension (if applicable)
+- Rationale
+```
+
+---
+
+### 5.3.2 GTM Lens Agent
+
+**Purpose**
+
+* Interpret execution-level changes:
+  channels, pricing, access, sales models
+
+**Output**
+
+```
+- Relevance strength
+- Confidence score
+- Rationale
+```
+
+---
+
+### 5.3.3 Positioning Lens Agent
+
+**Purpose**
+
+* Interpret messaging, differentiation, target segment changes
+
+**Output**
+
+```
+- Relevance strength
+- Confidence score
+- Rationale
+```
+
+---
+
+## 5.4 Category Confidence Check (Key Design Addition)
+
+### Purpose
+
+Resolve whether an insight can be confidently categorized **without forcing classification**.
+
+### Logic (Conceptual)
+
+```
+if max(lens_confidence) ≥ category_threshold:
+    assign that category
+else:
+    leave category unset
+```
+
+### Important Notes
+
+* This is **not** a category called “Uncategorized”
+* This is a **temporary absence of category**
+* Severity and velocity are unaffected
+
+---
+
+## 6. Final Insight Object
+
+An Insight must always contain:
+
+```
+- Scope
+- Time window
+- Severity
+- Velocity
+- Explanation
+- Category (optional, if confidence met)
+```
+
+An Insight is **valid even if category is unset**.
+
+---
+
+## 7. Presentation Rules
+
+---
+
+## 7.1 Recent Market Activity
+
+### Inclusion Criteria
+
+```
+severity ≥ threshold OR velocity is high
+```
+
+### Category Requirement
+
+* **Not required**
+* Category is ignored for inclusion
+
+### Behavior
+
+* Insights are rendered once
+* Framed as “recent change”
+* Category may be absent or hidden
+
+This ensures **strong insights are never suppressed**.
+
+---
+
+## 7.2 Theme / GTM / Positioning Sections
+
+### Inclusion Criteria
+
+```
+insight.category == section_category
+```
+
+### Behavior
+
+* Category is mandatory
+* Uncategorized insights are excluded
+* No fallback or forced placement
+
+---
+
+## 8. Edge Case Handling (Required)
+
+---
+
+## 8.1 Edge Case 1
+
+### Strong Insight with No Clean Category
+
+**Example**
+
+* Early regulatory shift
+* Mixed signals across lenses
+* High severity or velocity
+
+**Correct Behavior**
+
+* Insight is created
+* Category confidence fails
+* Insight appears in **Recent Market Activity**
+* Insight does **not** appear in category sections
+
+**Rationale**
+
+* Avoids forced classification
+* Preserves visibility
+* Aligns with PRD amendment
+
+---
+
+## 8.2 Edge Case 2
+
+### Non-Competitor Market Action Affecting Product
+
+**Example**
+
+* Non-competitor exits adjacent product
+* Direct relevance to partner product
+
+**Correct Behavior**
+
+* Insight scoped to product or market
+* Theme lens applies adjacency logic
+* No new competitor entity introduced
+* Insight may be categorized **only if confidence exists**
+
+**Never Allowed**
+
+* Adding the non-competitor to competitor views
+* Entity-scoped insights for out-of-scope actors
+
+---
+
+## 9. Regulatory / FDA-Style Events (Canonical Example)
+
+Regulatory events:
+
+* Often high severity
+* Often ambiguous initially
+* Often cross-cutting
+
+**Correct Handling**
+
+1. Early stage:
+
+   * Insight created
+   * Category confidence low
+   * Visible in Recent Market Activity only
+
+2. Later stage:
+
+   * Behavioral signals emerge
+   * New GTM or Positioning insights may be generated
+   * Original insight remains Theme or uncategorized
+
+**Key Rule**
+
+> Downstream impact ≠ current categorization
+
+---
+
+## 10. Invariants (Must Not Be Violated)
+
+1. No insight without scope, severity, velocity, explanation
+2. No forced categorization
+3. No category-specific insight synthesis
+4. No suppression of high-severity / high-velocity insights
+5. No speculative downstream projection
+
+---
+
+## 11. Summary
+
+This pipeline:
+
+* Preserves PRD intent
+* Prevents insight loss due to ambiguity
+* Avoids misleading categorization
+* Scales cleanly to competitors, products, and future agents
+* Is safe for autonomous agent execution
+
+**Core Principle**
+
+> **Insight importance is determined first.
+> Categorization is applied when justified, not when convenient.**
+
+---
+

@@ -1,0 +1,1312 @@
+Insight Pulse - Product Requirements Document
+---
+
+# **1. Introduction & Product Overview**
+
+---
+
+## **1.1 Purpose of This Document**
+
+This document defines the **product requirements, system behavior, and user-facing structure** of **Insight Pulse**.
+
+The purpose of this document is to:
+
+* Specify *what the system is expected to do*
+* Define *key concepts and guarantees*
+* Describe *user interactions and flows*
+
+This document intentionally **does not describe implementation details**, internal mechanisms, or technical architecture.
+All descriptions are expressed in terms of **observable system behavior and outputs**.
+
+---
+
+## **1.2 Product Definition**
+
+**Insight Pulse** is a **B2B market intelligence and decision-support system** designed for partner organizations to monitor, contextualize, and interpret changes in their competitive and product landscape over time.
+
+The system:
+
+* Operates in a **tenant-specific context**
+* Surfaces **synthesized insights**, not raw information
+* Emphasizes **change, patterns, and relevance** rather than static facts
+
+Insight Pulse is designed to support **human decision-making**, not to automate or replace it.
+
+---
+
+## **1.3 Intended Users**
+
+Insight Pulse is intended for users within partner organizations who are involved in:
+
+* Strategic planning
+* Product management
+* Market analysis
+* Competitive intelligence
+* Go-to-market planning
+
+The system assumes users:
+
+* Have domain familiarity
+* Seek prioritization and context rather than exhaustive data
+* Use insights as inputs into broader decision processes
+
+---
+
+## **1.4 Core Value Proposition**
+
+Insight Pulse provides value by:
+
+1. **Reducing information overload**
+
+   * By synthesizing signals into structured insights
+
+2. **Highlighting meaningful change**
+
+   * By prioritizing severity, velocity, and relevance
+
+3. **Preserving historical context**
+
+   * By maintaining memory of past activity and trends
+
+4. **Linking intelligence to decisions**
+
+   * By explicitly mapping insights to affected decision domains
+
+The system focuses on *what matters now*, *why it matters*, and *where it may have impact*.
+
+---
+
+## **1.5 System Boundaries**
+
+Insight Pulse explicitly **does not**:
+
+* Recommend actions
+* Make decisions on behalf of users
+* Provide predictive guarantees
+* Expose raw or unfiltered data feeds
+
+Instead, the system guarantees:
+
+* Contextualized presentation of intelligence
+* Explainable insight generation
+* Consistent behavior across tenant environments
+
+---
+
+## **1.6 High-Level Functional Scope**
+
+At a high level, Insight Pulse enables users to:
+
+* Access a centralized dashboard of market intelligence
+* Track competitor-level changes and patterns
+* Track product-level and adjacent product changes
+* Explore insights categorized by theme, GTM, and positioning
+* Identify high-priority developments through severity and velocity indicators
+
+All functionality operates strictly within the **partner-defined scope** of products and competitors.
+
+---
+
+## **1.7 Compliance and Interpretability Statement**
+
+This specification is written to be:
+
+* **Deterministic in intent**
+* **Free of ambiguous terminology**
+* **Safe for interpretation by automated systems**
+
+All key concepts used in this section are:
+
+* Defined explicitly later in the document
+* Used consistently across sections
+* Independent of implementation strategy
+
+---
+---
+
+# **2. Problem Statement & Motivation**
+
+---
+
+## **2.1 Context**
+
+Organizations operating in competitive and regulated markets must continuously monitor:
+
+* Competitor behavior
+* Product-level changes
+* Market-wide shifts in strategy, positioning, and go-to-market approaches
+
+This information is **dynamic**, **fragmented**, and **uneven in relevance** across time and organizational roles.
+
+---
+
+## **2.2 Core Problem**
+
+The primary problem Insight Pulse addresses is:
+
+> **Organizations lack a structured way to continuously identify, prioritize, and contextualize meaningful market changes within their specific competitive and product scope.**
+
+This problem manifests as difficulty in answering:
+
+* What has changed that actually matters?
+* Is this change isolated or part of a broader pattern?
+* How does this change relate to our products or competitors?
+* Which types of decisions does this change put pressure on?
+
+---
+
+## **2.3 Limitations of Existing Approaches**
+
+Current approaches typically rely on combinations of:
+
+* Static reports
+* Periodic summaries
+* Ad-hoc monitoring
+* Manual interpretation of disparate information sources
+
+These approaches have the following limitations:
+
+1. **Lack of Continuity**
+
+   * Information is reviewed as isolated snapshots
+   * Historical context is often lost between reporting cycles
+
+2. **Poor Signal Prioritization**
+
+   * High-impact changes are mixed with low-relevance updates
+   * Users must manually determine importance
+
+3. **Insufficient Contextualization**
+
+   * Changes are presented without clear linkage to:
+
+     * Specific products
+     * Competitive relationships
+     * Decision relevance
+
+4. **Reactive, Not Ongoing**
+
+   * Insights are discovered after delays
+   * Patterns emerge late, reducing response time
+
+---
+
+## **2.4 User Impact**
+
+As a result of these limitations, users experience:
+
+* Information overload without clarity
+* Missed early signals of strategic change
+* Difficulty justifying decisions using consistent intelligence
+* Increased dependence on manual synthesis and interpretation
+
+This increases cognitive load and reduces confidence in decision-making.
+
+---
+
+## **2.5 Problem Constraints**
+
+Any solution addressing this problem must satisfy the following constraints:
+
+* Operate within a **partner-defined scope**
+* Preserve historical context across time
+* Prioritize changes based on importance and momentum
+* Avoid prescriptive or automated decision-making
+* Provide explainable reasoning for surfaced intelligence
+
+---
+
+## **2.6 Motivation for Insight Pulse**
+
+Insight Pulse is motivated by the need for a system that:
+
+* Treats **change**, not data volume, as the primary signal
+* Maintains **memory** to distinguish trends from noise
+* Structures intelligence around **decision relevance**
+* Supports human judgment rather than replacing it
+
+The goal is not to increase information availability, but to **increase clarity, focus, and continuity** in how market intelligence is consumed.
+
+---
+
+## **2.7 Success Criteria (Problem-Oriented)**
+
+The problem addressed by Insight Pulse is considered successfully mitigated if users can:
+
+* Quickly identify which competitors or products have meaningfully changed
+* Understand whether changes are isolated or accelerating
+* See how changes relate to their own product portfolio
+* Use insights as credible inputs into strategic and operational decisions
+
+---
+
+## **2.8 Interpretability and Compliance Statement**
+
+This problem statement:
+
+* Uses explicitly defined terminology
+* Avoids assumptions about implementation
+* Describes observable user-facing deficiencies
+
+All terms introduced here are either defined in this document or expanded in subsequent sections, ensuring consistent interpretation by both human readers and automated systems.
+
+---
+
+
+---
+
+# **3. Product Vision, Goals & Non-Goals**
+
+---
+
+## **3.1 Product Vision**
+
+The vision of Insight Pulse is to provide partner organizations with a **continuous, structured, and explainable view of meaningful change** within their competitive and product landscape.
+
+The system aims to enable users to:
+
+* Maintain awareness of evolving market conditions
+* Recognize emerging patterns early
+* Understand how external changes relate to internal products and decisions
+
+Insight Pulse is designed as a **decision-support system**, not a decision-making system.
+
+---
+
+## **3.2 Guiding Principles**
+
+The product is guided by the following principles:
+
+1. **Change Over Volume**
+   The system prioritizes detecting and presenting change rather than aggregating large quantities of information.
+
+2. **Context Over Raw Facts**
+   Information is always presented with scope, relevance, and temporal framing.
+
+3. **Continuity Over Snapshots**
+   The system preserves historical context to distinguish trends from isolated events.
+
+4. **Explainability Over Automation**
+   All surfaced intelligence must be traceable and interpretable.
+
+5. **Human Judgment as the Final Authority**
+   The system supports, but does not replace, human decision-making.
+
+---
+
+## **3.3 Product Goals**
+
+Insight Pulse has the following primary goals:
+
+1. **Enable Continuous Situational Awareness**
+   Users can quickly understand what has changed within their scoped market environment.
+
+2. **Improve Attention Prioritization**
+   The system highlights which changes are most important or urgent using severity and velocity.
+
+3. **Preserve and Surface Historical Patterns**
+   Users can recognize recurring behavior and directional trends over time.
+
+4. **Connect Intelligence to Decision Contexts**
+   Insights are explicitly mapped to the types of decisions they may influence.
+
+5. **Reduce Cognitive Load**
+   Users spend less time interpreting fragmented information and more time evaluating implications.
+
+---
+
+## **3.4 Success Metrics (Behavioral, Not Technical)**
+
+The product is considered successful if users can:
+
+* Identify high-impact changes without reviewing all updates
+* Distinguish one-time events from emerging trends
+* Confidently explain why a particular insight matters
+* Use insights as inputs to structured decision discussions
+
+These outcomes are evaluated through observable user behavior rather than system internals.
+
+---
+
+## **3.5 Explicit Non-Goals**
+
+Insight Pulse explicitly does **not** aim to:
+
+* Recommend specific actions
+* Automate or execute decisions
+* Predict future outcomes with guarantees
+* Replace domain experts or strategic planning processes
+* Expose raw or unfiltered information streams
+
+Any functionality that would violate these constraints is considered out of scope.
+
+---
+
+## **3.6 Scope Boundaries**
+
+To maintain focus and interpretability, Insight Pulse:
+
+* Operates only within partner-defined products and competitors
+* Surfaces insights only when relevance thresholds are met
+* Avoids presenting speculative or unverifiable information
+
+These boundaries ensure consistency, trust, and clarity across all tenant environments.
+
+---
+
+## **3.7 Compliance and Interpretability Statement**
+
+This section defines **intent and constraints**, not implementation.
+
+All goals and non-goals are:
+
+* Expressed in observable terms
+* Independent of technical design
+* Used as invariants for all subsequent sections of this document
+
+---
+
+---
+
+# **4. System Scope & Access Model**
+
+---
+
+## **4.1 System Scope**
+
+Insight Pulse operates within a **strictly defined scope** determined by each partner organization.
+
+The system scope defines:
+
+* Which entities are visible to a user
+* What types of insights may be surfaced
+* How relevance and context are interpreted
+
+All user-facing functionality is constrained by this scope.
+
+---
+
+## **4.2 Partner Organization Model**
+
+Insight Pulse is accessed by **partner organizations**.
+
+Each partner organization:
+
+* Represents a single tenant
+* Has a private, isolated view of the system
+* Defines its own competitive and product universe
+
+No partner organization has visibility into:
+
+* Other partner organizations
+* Their data
+* Their insights
+
+---
+
+## **4.3 Tenant Definition**
+
+A tenant is defined as:
+
+* A logical boundary that encapsulates:
+
+  * A set of products
+  * A set of competitor organizations
+  * Associated relationships and relevance rules
+
+Tenants are **preconfigured** and available at the time of user authentication.
+
+Tenant configuration is assumed to occur **outside the user-facing system flow**.
+
+---
+
+## **4.4 Product and Competitor Scope**
+
+Within each tenant:
+
+* The **product scope** consists of:
+
+  * Products owned or managed by the partner organization
+
+* The **competitor scope** consists of:
+
+  * External organizations identified by the partner as relevant competitors
+
+Only entities explicitly included in the tenant scope:
+
+* Can generate insights
+* Can appear in dashboards or trackers
+* Can be referenced in adjacency relationships
+
+---
+
+## **4.5 User Access Assumptions**
+
+Users accessing Insight Pulse:
+
+* Belong to a single partner organization
+* Are authenticated into one tenant at a time
+* Share a common product and competitor scope within that tenant
+
+Role differentiation, if any, does not affect:
+
+* Data visibility
+* Insight availability
+
+(This may be extended in future iterations but is out of scope here.)
+
+---
+
+## **4.6 Access Guarantees**
+
+Insight Pulse guarantees that:
+
+* Users can only access data and insights within their tenant
+* All surfaced intelligence is scoped to:
+
+  * Tenant-defined products
+  * Tenant-defined competitors
+* No cross-tenant inference or leakage occurs
+
+These guarantees are absolute and non-negotiable.
+
+---
+
+## **4.7 Scope Enforcement Principles**
+
+The system enforces scope by:
+
+* Ignoring entities not included in the tenant configuration
+* Suppressing insights that fall outside defined relevance boundaries
+* Maintaining consistency across all pages and views
+
+Scope enforcement applies uniformly to:
+
+* Dashboards
+* Trackers
+* Drill-down views
+
+---
+
+## **4.8 Compliance and Interpretability Statement**
+
+This section defines **access boundaries and visibility guarantees**.
+
+All statements are:
+
+* Independent of authentication or storage mechanisms
+* Expressed in terms of observable system behavior
+* Intended to prevent ambiguity in system interpretation
+
+Subsequent sections assume and build upon these scope constraints.
+
+---
+---
+
+# **5. Core Concepts & Insight Model**
+
+---
+
+## **5.1 Purpose of This Section**
+
+This section defines the **foundational concepts, terms, and behavioral rules** that govern how Insight Pulse represents, interprets, and presents intelligence.
+
+All subsequent sections rely on the definitions and constraints introduced here.
+No implementation details or mechanisms are assumed or implied.
+
+---
+
+## **5.2 Fundamental Units of Information**
+
+Insight Pulse operates on three conceptual units. These units are logical constructs, not technical artifacts.
+
+---
+
+### **5.2.1 Events**
+
+An **event** is a discrete, observable occurrence relevant to the market, a competitor, or a product.
+
+Characteristics:
+
+* Represents a single occurrence
+* Is time-bound
+* Is factual in nature
+
+Examples:
+
+* A competitor announces a pricing change
+* A product updates its indication language
+* A company enters or exits a market
+
+Events are not surfaced directly to users.
+
+---
+
+### **5.2.2 Signals**
+
+A **signal** is an interpreted indication derived from one or more events.
+
+Characteristics:
+
+* Represents the *type* of change implied by events
+* May aggregate multiple related events
+* Introduces initial context but not full interpretation
+
+Examples:
+
+* Increased pricing pressure
+* Shift in go-to-market approach
+* Expansion into an adjacent indication
+
+Signals may persist across time and may recur.
+
+---
+
+### **5.2.3 Insights**
+
+An **insight** is a synthesized interpretation of one or more signals that represents a meaningful change, emerging pattern, or risk.
+
+Insights are the **primary unit of value** presented to users.
+
+---
+
+## **5.3 Formal Definition of an Insight**
+
+> **An insight is a synthesized interpretation of one or more signals that indicates a meaningful change or pattern within a defined scope and time window, contextualized by severity, velocity, and decision relevance for a partner organization.**
+
+This definition applies uniformly across all system views.
+
+---
+
+## **5.4 Required Insight Attributes**
+
+Every insight surfaced by Insight Pulse must logically include the following attributes:
+
+---
+
+### **5.4.1 Scope**
+
+Defines *what the insight applies to*:
+
+* A specific product
+* A specific competitor
+* A broader thematic or market context
+
+An insight must always have at least one clearly defined scope.
+
+Market-Originated Insights
+Insights may originate from market activity outside the explicitly defined competitor set, provided the activity has direct or adjacent relevance to a partner-defined product or market segment and meets defined severity thresholds.
+Such insights are scoped to products or thematic market contexts and do not introduce new competitor entities.
+
+---
+
+### **5.4.2 Time Window**
+
+Defines *when the insight emerged*:
+
+* Expressed as a bounded period
+* Supports rolling and comparative views
+
+Time windows ensure insights are temporally grounded.
+
+---
+
+### **5.4.3 Severity**
+
+Severity represents the **relative importance** of an insight.
+
+Severity is expressed categorically (e.g., minor, notable, critical) and is determined based on factors such as:
+
+* Nature of the change
+* Breadth of impact
+* Proximity to the partner’s products
+* Recurrence over time
+
+Severity is used for prioritization, not prediction.
+
+---
+
+### **5.4.4 Velocity**
+
+Velocity represents the **rate and direction of change over time**.
+
+Velocity is derived from historical context and may indicate:
+
+* Increasing activity
+* Stable behavior
+* Decreasing activity
+
+Velocity distinguishes isolated events from emerging or accelerating patterns.
+
+---
+
+### **5.4.5 Decision Domains**
+
+Each insight is mapped to one or more **decision domains** indicating the types of decisions it may influence.
+
+Examples of decision domains include:
+
+* Pricing and contracting
+* Go-to-market strategy
+* Positioning and messaging
+* Portfolio planning
+* Competitive response planning
+
+This mapping provides relevance without prescribing actions.
+
+---
+
+## **5.5 Temporal Memory and Continuity**
+
+Insight Pulse explicitly maintains **memory across time**.
+
+This enables the system to:
+
+* Detect recurrence
+* Compare current activity to historical baselines
+* Surface trends rather than isolated changes
+
+Temporal memory is used to:
+
+* Inform velocity
+* Provide historical context
+* Support longitudinal analysis
+
+The system treats time as a first-class dimension of intelligence.
+
+---
+
+## **5.6 Adjacency and Relationship Modeling**
+
+Insight Pulse defines **adjacency** to explain indirect relevance.
+
+---
+
+### **5.6.1 Adjacency Dimensions**
+
+Two entities are considered adjacent if they overlap along one or more declared dimensions, such as:
+
+* Therapeutic area
+* Indication
+* Modality or mechanism
+* Target segment
+* Pricing or reimbursement pathway
+
+Adjacency is declarative and explainable.
+
+---
+
+### **5.6.2 Adjacency Rule**
+
+> A change affecting an entity is considered adjacent if the entity shares at least one defined adjacency dimension with a partner-scoped product.
+
+All adjacency-based insights must explicitly state the dimension involved.
+
+---
+
+## **5.7 Insight Categorization**
+
+Insights are categorized to support structured interpretation.
+
+Primary categories include:
+
+* Theme insights (market-wide patterns)
+* GTM insights (market approach and execution)
+* Positioning insights (messaging and differentiation)
+
+While most insights are categorized as Theme, GTM, or Positioning, the system may surface high-severity or high-velocity insights that do not yet map cleanly to a single category.
+Such insights are considered uncategorized insights and are eligible for inclusion in overview-level presentations.
+
+Categorization does not alter insight meaning; it supports navigation and analysis.
+
+---
+
+## **5.8 Explainability and Consistency Guarantees**
+
+Insight Pulse guarantees that:
+
+* Every insight is traceable to underlying signals
+* Relevance and adjacency are explicitly stated
+* Severity and velocity are applied consistently
+* Similar patterns produce comparable insights across time
+
+Explainability is a core requirement, not an optional feature.
+
+---
+
+## **5.9 Constraints and Invariants**
+
+The following constraints apply to all concepts defined in this section:
+
+* Insights must not be speculative
+* Insights must not recommend actions
+* Insights must be scoped to the tenant context
+* Insights must be interpretable without system internals
+
+These constraints are enforced uniformly across the system.
+
+---
+
+## **5.10 Interpretability Statement**
+
+All concepts defined in this section:
+
+* Are used consistently across the document
+* Are independent of implementation choices
+* Serve as invariants for system behavior
+
+Any future extension of Insight Pulse must preserve these definitions unless explicitly revised.
+
+---
+
+
+---
+
+# **6. Intelligence Presentation & Prioritization**
+
+---
+
+## **6.1 Purpose of This Section**
+
+This section defines **how insights are presented to users** and **how user attention is guided** across the system.
+
+The goal is to ensure that:
+
+* High-impact intelligence is surfaced prominently
+* Lower-priority information does not overwhelm users
+* Users can move from overview to detail in a controlled manner
+
+This section describes *presentation logic*, not visual layout.
+
+---
+
+## **6.2 Presentation Principles**
+
+All intelligence in Insight Pulse is presented according to the following principles:
+
+1. **Priority Before Exhaustiveness**
+   Users are shown what matters most before what is merely recent.
+
+2. **Context Before Detail**
+   Summaries and indicators precede drill-down information.
+
+3. **Continuity Over Snapshots**
+   Insights reflect patterns over time, not isolated moments.
+
+4. **Consistency Across Views**
+   The same insight maintains its meaning and priority wherever it appears.
+
+---
+
+## **6.3 Attention Prioritization Framework**
+
+Insight Pulse uses **severity** and **velocity** as the primary mechanisms for guiding user attention.
+
+### **6.3.1 Severity-Based Prioritization**
+
+* Insights with higher severity are surfaced more prominently
+* Severity communicates *importance*, not urgency
+* Severity is used to:
+
+  * Order insights
+  * Determine inclusion in summary views
+
+---
+
+### **6.3.2 Velocity-Based Prioritization**
+
+* Insights with increasing velocity indicate accelerating change
+* Velocity communicates *momentum*
+* Velocity is used to:
+
+  * Highlight emerging patterns
+  * Differentiate trends from one-off changes
+
+---
+
+### **6.3.3 Combined Interpretation**
+
+When severity and velocity are considered together:
+
+* High severity + high velocity → immediate attention
+* High severity + low velocity → strategic monitoring
+* Low severity + high velocity → early signal
+* Low severity + low velocity → background context
+
+This interpretation is implicit and non-prescriptive.
+
+---
+
+## **6.4 Overview-Level Intelligence Presentation**
+
+The system provides **high-level summaries** that allow users to rapidly assess the current state of their environment.
+Overview-level presentations may include uncategorized insights when immediacy or significance outweighs the need for structured classification.
+
+These summaries:
+
+* Aggregate insights meeting defined significance thresholds
+* Exclude low-relevance information by default
+* Preserve links to deeper exploration
+
+Overview-level presentation answers:
+
+> “What should I be paying attention to right now?”
+
+---
+
+## **6.5 Rolling Pulse Presentation**
+
+The Rolling Pulse is a key presentation construct.
+
+Characteristics:
+
+* Represents insights observed over a rolling time window
+* Includes only insights meeting significance criteria
+* Emphasizes accumulation and persistence of change
+
+The Rolling Pulse enables users to:
+
+* See how recent changes relate to one another
+* Understand short-term evolution without reviewing individual updates
+
+---
+
+## **6.6 Categorized Insight Presentation**
+
+Insights are grouped into conceptual categories to support structured interpretation:
+
+* **Theme Insights**
+  Surface market-wide or cross-entity patterns.
+
+* **GTM Insights**
+  Surface changes in market engagement or execution strategies.
+
+* **Positioning Insights**
+  Surface shifts in messaging, differentiation, or target focus.
+
+Categorization aids navigation but does not alter insight priority.
+Theme insights may include high-severity market signals originating outside the defined competitor set when they materially affect the partner’s product landscape.
+
+---
+
+## **6.7 Drill-Down Readiness**
+
+All summarized intelligence must support **progressive disclosure**.
+
+This means:
+
+* Every summary view has a corresponding detailed view
+* Users can access deeper context without losing orientation
+* Historical and relational context is preserved during exploration
+
+Drill-down is optional, not required, for understanding.
+
+---
+
+## **6.8 Consistency Across Entry Points**
+
+The same insight may appear in multiple contexts (e.g., dashboard, product view, competitor view).
+
+Insight Pulse guarantees that:
+
+* The insight’s meaning does not change across contexts
+* Severity, velocity, and scope remain consistent
+* Presentation adapts only in framing, not substance
+
+---
+
+## **6.9 Non-Prescriptive Framing**
+
+All intelligence is presented as **contextual information**, not instruction.
+
+The system:
+
+* Does not suggest actions
+* Does not rank “recommended responses”
+* Does not imply correctness of any decision
+
+Presentation is designed to support judgment, not replace it.
+
+---
+
+## **6.10 Interpretability and Compliance Statement**
+
+This section defines **observable presentation behavior**.
+
+All prioritization and grouping rules:
+
+* Are independent of computation methods
+* Can be interpreted without system internals
+* Are applied uniformly across the system
+
+These rules ensure predictable and explainable user experience.
+
+---
+---
+
+# **7. User Interaction & Page Architecture**
+
+This section describes the user-facing flow of Insight Pulse, starting from onboarding through core functional pages.
+It is **UI-agnostic but element-specific**, defining *what must exist* on each page without constraining layout or visual positioning.
+
+---
+
+## **7.1 Onboarding Page**
+
+### **7.1.1 Purpose**
+
+The onboarding page introduces Insight Pulse to first-time users and establishes:
+
+* What the system does
+* What kind of value it provides
+* How users will interact with it once authenticated
+
+This page exists **before authentication** and does not expose any tenant-specific data.
+
+---
+
+### **7.1.2 Core Elements**
+
+The onboarding page must include:
+
+1. **Product Overview**
+
+   * A concise explanation of Insight Pulse as a B2B market intelligence and decision-support system
+   * Emphasis on:
+
+     * Continuous monitoring
+     * Synthesized insights (not raw data)
+     * Support for strategic and operational decision-making
+
+2. **What Insight Pulse Is Used For**
+
+   * High-level description of:
+
+     * Tracking market and competitor activity
+     * Monitoring product and adjacent product changes
+     * Understanding GTM, positioning, and thematic shifts over time
+
+3. **Access Clarification**
+
+   * Clear indication that Insight Pulse is:
+
+     * Available only to partner organizations
+     * Accessed via company-provisioned credentials
+
+4. **Call-to-Action**
+
+   * Option to proceed to login using company credentials
+   * Optional secondary CTA (e.g., contact or request access), without functional dependency
+
+---
+
+### **7.1.3 Transition**
+
+* When the user chooses to log in, they are taken to the **Login Page**
+* No tenant creation or configuration occurs on the frontend
+
+---
+
+## **7.2 Login Page**
+
+### **7.2.1 Purpose**
+
+The login page authenticates users into their **preconfigured tenant environment**.
+
+All tenant setup (products, competitors, access rules) is assumed to be completed **backend-side**.
+
+---
+
+### **7.2.2 Core Elements**
+
+1. **Credential-Based Authentication**
+
+   * Login using company-provided credentials
+   * No sign-up or tenant configuration flows
+
+2. **Context Awareness**
+
+   * Authentication is mapped to:
+
+     * A specific partner organization
+     * A predefined tenant scope
+
+3. **Error Handling**
+
+   * Invalid credentials or access issues are handled without exposing system internals
+
+---
+
+### **7.2.3 Transition**
+
+* On successful authentication, the user is routed directly to the **Dashboard**
+* The dashboard reflects only the authenticated tenant’s scope
+
+---
+
+## **7.3 Dashboard**
+
+### **7.3.1 Purpose**
+
+The dashboard is the **central intelligence hub** of Insight Pulse.
+It provides a high-level, continuously updated view of the partner’s market and competitive landscape.
+
+The dashboard is designed for:
+
+* Rapid situational awareness
+* Prioritization of attention
+* Entry points into deeper exploration
+
+---
+
+### **7.3.2 Core Elements (Position-Agnostic but Mandatory)**
+
+#### **7.3.2.1 Recent Market Activity**
+
+* A section summarizing the most recent, high-signal events and insights
+* Focuses on:
+
+  * Meaningful changes
+  * Emerging patterns
+  * High-severity or high-velocity activity
+
+This section answers:
+
+> “What has changed recently that I should be aware of?”
+
+---
+
+#### **7.3.2.2 Rolling Pulse (formerly Weekly Brief)**
+
+* A summarized view of key insights over a rolling time window
+* Window size is predefined (e.g., last 7–14 days)
+* Includes:
+
+  * Only insights meeting significance criteria (severity or velocity)
+
+This section emphasizes:
+
+* Continuity over time
+* Change accumulation rather than isolated events
+
+---
+
+#### **7.3.2.3 General Insights**
+
+The dashboard includes three **distinct but conceptually aligned insight categories**:
+
+1. **Theme Insights**
+
+   * Market-wide or macro-level patterns
+   * Examples:
+
+     * Emerging therapeutic trends
+     * Shifts in regulatory or technology focus
+
+2. **GTM (Go-To-Market) Insights**
+
+   * Changes in how companies are approaching the market
+   * Examples:
+
+     * Channel strategy changes
+     * Sales model evolution
+     * Market entry or exit behavior
+
+3. **Positioning Insights**
+
+   * Changes in how products or companies position themselves
+   * Examples:
+
+     * Messaging shifts
+     * Target segment changes
+     * Differentiation claims
+
+Each insight:
+
+* Is synthesized (not raw data)
+* Carries severity and velocity metadata
+* Is scoped to the tenant’s products or competitors
+
+---
+
+### **7.3.3 Navigation**
+
+The dashboard provides access to:
+
+* Competitor Tracker
+* Product Tracker
+
+---
+
+## **7.4 Competitor Tracker**
+
+### **7.4.1 Purpose**
+
+The competitor tracker allows users to monitor **partner-defined competitor companies**, identify recent changes, and drill into detailed competitive intelligence.
+
+---
+
+### **7.4.2 Competitor List View**
+
+#### **7.4.2.1 Core Elements**
+
+1. **Competitor List**
+
+   * Displays all competitors configured for the tenant
+   * Each competitor is represented as a distinct list item
+
+2. **Status Indicators**
+
+   * Visual markers indicating whether:
+
+     * New information has been synced recently
+     * Significant updates have occurred since last review
+
+3. **Quick Update Summary**
+
+   * Brief, high-level description of recent activity (if any)
+   * Designed for scanning, not deep analysis
+
+This view answers:
+
+> “Which competitors have changed, and where should I look first?”
+
+---
+
+### **7.4.3 Expanded Competitor View**
+
+Triggered when a user selects a competitor from the list.
+
+#### **7.4.3.1 Core Elements**
+
+1. **Detailed Insights**
+
+   * Synthesized insights specific to the selected competitor
+   * Organized by:
+
+     * Theme
+     * GTM
+     * Positioning
+     * Product-level changes (where relevant)
+
+2. **Temporal Context**
+
+   * Insights reflect historical memory:
+
+     * Recurrence
+     * Trend direction
+     * Velocity
+
+3. **Explainability**
+
+   * Each insight is traceable to underlying signals
+   * Adjacency or relevance is explicitly stated where applicable
+
+This view supports:
+
+* Strategic analysis
+* Competitive planning
+* Longitudinal understanding of competitor behavior
+
+---
+
+## **7.5 Product Tracker**
+
+### **7.5.1 Purpose**
+
+The product tracker focuses on the **partner’s own products** and monitors both direct and adjacent market activity affecting them.
+
+---
+
+### **7.5.2 Product List View**
+
+#### **7.5.2.1 Core Elements**
+
+1. **Product List**
+
+   * Displays all products configured for the tenant
+
+2. **Update Indicators**
+
+   * Visual markers showing:
+
+     * Recent updates to the product itself
+     * Relevant changes in adjacent products
+
+3. **Quick Update Signals**
+
+   * Brief indicators of:
+
+     * What changed
+     * Whether the change is direct or adjacent
+
+This view answers:
+
+> “Which of our products are affected by recent market or competitive changes?”
+
+---
+
+### **7.5.3 Expanded Product View**
+
+Triggered when a user selects a product from the list.
+
+#### **7.5.3.1 Core Elements**
+
+1. **Product-Specific Insights**
+
+   * Insights scoped directly to the selected product
+   * Includes:
+
+     * Market changes
+     * Competitor actions
+     * Adjacent product movements
+
+2. **Adjacency Context**
+
+   * Explicit explanation of:
+
+     * Why a change is considered adjacent
+     * Which adjacency dimension applies
+
+3. **Temporal and Priority Signals**
+
+   * Severity and velocity indicators
+   * Historical recurrence where applicable
+
+This view supports:
+
+* Product strategy
+* Risk assessment
+* Opportunity identification
+
+---
+
+## **7.6 Cross-Cutting Design Principles**
+
+Across all pages:
+
+* **No raw data dumps**
+* **Insights are always contextualized**
+* **Markers and summaries exist to guide attention**
+* **Depth is available on demand, not forced**
+
+The system prioritizes:
+
+* Explainability over automation
+* Context over volume
+* Decision relevance over recommendation
+
+---
+
+## **7.7 End-to-End User Flow Summary**
+
+1. User lands on onboarding page → understands what Insight Pulse is
+2. User logs in using company credentials
+3. User enters the dashboard → gains immediate situational awareness
+4. User navigates to:
+
+   * Competitor Tracker for external intelligence
+   * Product Tracker for portfolio-focused intelligence
+5. User drills down selectively based on severity, velocity, and relevance
+
+---
