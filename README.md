@@ -1,52 +1,76 @@
-# Insight Pulse
+# Insight Pulse 📊
 
 **Always-on market intelligence for pharmaceutical decision-making.**
 
-Insight Pulse is an agentic system that ingests market signals (news, regulatory updates, competitor moves) and synthesized them into structured, decision-ready insights.
+Insight Pulse is an **agentic AI pipeline** that monitors competitor moves, clinical updates, and regulatory shifts. It transforms fragmented market signals into structured, high-fidelity strategic insights categorized by **Theme, GTM, and Positioning**.
 
 ---
 
-## **🚀 Quick Start: Demo Version**
+## 🌟 Choose Your Mode
 
-To see the system in action without setting up LLMs or data pipelines, run the **Demo Version**.
+Depending on your environment, you can run Insight Pulse in two ways:
 
-This version uses a static snapshot of a real pipeline run, demonstrating:
-- **Noise Suppression**: How the system filters out irrelevant news.
-- **Silence as Signal**: Why some competitors show no updates.
-- **Entity Context**: How the same insight is framed differently for different products.
+### 1. 🚀 Quick Start: Seamless Demo Mode
+*Run the system in seconds without LLMs, API keys, or specialized hardware.*
 
-### **1. Install Backend Dependencies**
-```bash
-pip install fastapi uvicorn
-```
+The dashboard is built with a **Seamless Demo Mode** that uses precomputed high-fidelity data to showcase noise suppression, strategic mapping, and longitudinal tracking.
 
-### **2. Run the Demo Backend**
-```bash
-python demo_main.py
-```
-*The API server will start on `http://localhost:8000`.*
-
-### **3. Run the Frontend**
-Open a new terminal and run:
-```bash
-cd frontend
-npm install
-npm run dev
-```
-*The UI will live at `http://localhost:3000`.*
-
-### **4. Explore the Data**
-- **Dashboard**: [http://localhost:3000](http://localhost:3000)
-- **API Direct**: [http://localhost:8000/api/dashboard](http://localhost:8000/api/dashboard)
+1. **Start Frontend**:
+   ```bash
+   cd frontend
+   npm install
+   npm run dev
+   ```
+2. **Access Dashboard**: Open [http://localhost:3000](http://localhost:3000).
+3. **Trigger Demo**: Click **⚡ Run Pipeline**. When prompted that the backend is unavailable, click **OK** to enable Demo Mode.
 
 ---
 
-## **System Architecture (Full Version)**
+### 🧠 2. Full Implementation: Real-World Pipeline
+*Run the live agentic pipeline for real-time market intelligence.*
 
-The full system (available in `main.py`) consists of:
-1.  **Ingestion Agent**: Fetches and normalizes raw events.
-2.  **Main Insight Orchestrator**: Synthesizes unexpected changes into candidate insights.
-3.  **Lens Agents**: specialized reviewers for Theme, GTM, and Positioning.
-4.  **Context Pipeline**: Generates relative framing for detailed tracker views.
+#### **Requirements**
+- **Python 3.10+**
+- **Ollama** (running locally with `qwen2.5:3b` model)
+- **API Keys**: NewsAPI key added to a root `.env` file.
 
-*See `RootPrompt.txt` and pipeline specification files for detailed architectural constraints.*
+#### **Setup & Run**
+1. **Install Dependencies**:
+   ```bash
+   pip install fastapi uvicorn requests langchain langchain_community python-dotenv
+   cd frontend && npm install
+   ```
+2. **Configure Environment**: Create a `.env` in the root:
+   ```env
+   NEWSAPI_KEY=your_key_here
+   ```
+3. **Start Backend**:
+   ```bash
+   uvicorn main:app --reload
+   ```
+4. **Start Frontend**:
+   ```bash
+   cd frontend
+   npm run dev
+   ```
+5. **Generate Insights**: Click **⚡ Run Pipeline** in the dashboard. The system will ingest live signals and synthesize new strategic insights into the database.
+
+---
+
+## 🏗️ Architecture & Documentation
+
+Insight Pulse follows a modular **6-stage pipeline**:
+1. **Ingestion**: Multi-source gathering from NewsAPI, FDA, and USPTO.
+2. **Scoping**: Tenant-specific relevance filtering.
+3. **Memory**: MD5 fingerprinting for deduplication and velocity tracking.
+4. **Synthesis**: LLM orchestration (Few-Shot Prompting).
+5. **Categorization**: Multi-lens auditing for Theme, GTM, and Positioning.
+6. **Framing**: Strategic context linkage for focal entities.
+
+For a deep dive into the code and data flow, see [docs/system_architecture.md](docs/system_architecture.md).
+
+## 🛠️ Tech Stack
+- **Frontend**: Next.js 14, Tailwind CSS, Lucide React.
+- **Backend**: FastAPI (Python 3.10).
+- **Intelligence**: LangGraph, Ollama (Qwen 2.5 3B).
+- **Storage**: SQLite (insight_pulse.db).
