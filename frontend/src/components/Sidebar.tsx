@@ -37,11 +37,6 @@ const Sidebar = () => {
                             <span className="icon">💊</span> Product Tracker
                         </Link>
                     </li>
-                    <li>
-                        <Link href="/settings" className={pathname === '/settings' ? 'active' : ''}>
-                            <span className="icon">⚙️</span> Settings
-                        </Link>
-                    </li>
                 </ul>
             </nav>
 

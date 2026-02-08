@@ -1,0 +1,144 @@
+export const DEMO_DATA = {
+    "tenant": "Eli Lilly",
+    "insights": [
+        {
+            "id": 101,
+            "tenant_id": 1,
+            "scope": "competitor" as const,
+            "severity": "high" as const,
+            "velocity": "increasing" as const,
+            "explanation": "FDA issues new class-wide safety warning for GLP-1 agonists regarding potential suicidal ideation risks, requiring immediate labeling updates for all products in the class.",
+            "category": "Theme" as const,
+            "subjects": ["Mounjaro", "Zepbound", "Novo Nordisk", "Pfizer", "AstraZeneca"],
+            "created_at": "2026-02-07T09:15:00Z"
+        },
+        {
+            "id": 102,
+            "tenant_id": 1,
+            "scope": "competitor" as const,
+            "severity": "high" as const,
+            "velocity": "new" as const,
+            "explanation": "Novo Nordisk launches 'WegovyAccess' aggressive copay program, effectively undercutting Zepbound's out-of-pocket costs by 40% for commercially insured patients.",
+            "category": "GTM" as const,
+            "subjects": ["Novo Nordisk", "Zepbound"],
+            "created_at": "2026-02-07T14:30:00Z"
+        },
+        {
+            "id": 103,
+            "tenant_id": 1,
+            "scope": "competitor" as const,
+            "severity": "medium" as const,
+            "velocity": "stable" as const,
+            "explanation": "Novo Nordisk pivots Wegovy messaging to emphasize 'cardiovascular risk reduction' following SELECT trial data, directly challenging Zepbound's weight-loss-only positioning.",
+            "category": "Positioning" as const,
+            "subjects": ["Novo Nordisk", "Zepbound", "Mounjaro"],
+            "created_at": "2026-02-06T11:00:00Z"
+        },
+        {
+            "id": 104,
+            "tenant_id": 1,
+            "scope": "market" as const,
+            "severity": "medium" as const,
+            "velocity": "increasing" as const,
+            "explanation": "New academic study suggests GLP-1 agonists may be effective in treating alcohol use disorder, signaling a major potential market expansion.",
+            "category": "Theme" as const,
+            "subjects": ["Mounjaro", "Zepbound"],
+            "created_at": "2026-02-05T08:45:00Z"
+        },
+        {
+            "id": 105,
+            "tenant_id": 1,
+            "scope": "competitor" as const,
+            "severity": "low" as const,
+            "velocity": "decreasing" as const,
+            "explanation": "Pfizer terminates development of oral GLP-1 candidate lotiglipron due to elevated liver enzymes, reducing near-term oral competition.",
+            "category": "Uncategorized" as const,
+            "subjects": ["Pfizer"],
+            "created_at": "2026-02-04T16:20:00Z"
+        }
+    ],
+    "context_blocks": [
+        {
+            "insight_id": 101,
+            "focal_entity_name": "Mounjaro",
+            "focal_entity_type": "product",
+            "framing_text": "Direct impact: Requires immediate review of Mounjaro USPI Label warnings section and potential updates to HCP safety talking points."
+        },
+        {
+            "insight_id": 101,
+            "focal_entity_name": "Zepbound",
+            "focal_entity_type": "product",
+            "framing_text": "Direct impact: Requires immediate review of Zepbound USPI Label and consumer-facing safety materials. May affect upcoming DTC campaign approval."
+        },
+        {
+            "insight_id": 101,
+            "focal_entity_name": "Novo Nordisk",
+            "focal_entity_type": "competitor",
+            "framing_text": "Shared impact: Novo Nordisk forced to update Wegovy/Ozempic labels simultaneously, neutralizing any safety differentiation claims."
+        },
+        {
+            "insight_id": 102,
+            "focal_entity_name": "Zepbound",
+            "focal_entity_type": "product",
+            "framing_text": "High Threat: Novo's program directly targets Zepbound's launch cash-pay dynamic. Access team needs to evaluate matching the $25/month price point immediately."
+        },
+        {
+            "insight_id": 102,
+            "focal_entity_name": "Novo Nordisk",
+            "focal_entity_type": "competitor",
+            "framing_text": "Offensive Move: Novo is leveraging gross-to-net margin to block Zepbound uptake in non-formulary plans."
+        },
+        {
+            "insight_id": 103,
+            "focal_entity_name": "Zepbound",
+            "focal_entity_type": "product",
+            "framing_text": "Differentiation Risk: Wegovy now claims a medical benefit (CV risk) that Zepbound cannot yet match. Expect payer pressure to prefer Wegovy for CV-risk patients."
+        },
+        {
+            "insight_id": 103,
+            "focal_entity_name": "Mounjaro",
+            "focal_entity_type": "product",
+            "framing_text": "Indirect Risk: While Mounjaro is for T2D, the CV benefit spillover perception strengthens Novo's overall metabolic franchise prestige."
+        },
+        {
+            "insight_id": 103,
+            "focal_entity_name": "Novo Nordisk",
+            "focal_entity_type": "competitor",
+            "framing_text": "Strategic Pivot: Shifts competition from 'percent weight loss' (where Zepbound wins) to 'holistic health outcome' (where Wegovy wins)."
+        },
+        {
+            "insight_id": 104,
+            "focal_entity_name": "Mounjaro",
+            "focal_entity_type": "product",
+            "framing_text": "Opportunity: Clinical development team should assess feasibility of adding addiction endpoints to long-term outcome studies."
+        },
+        {
+            "insight_id": 104,
+            "focal_entity_name": "Zepbound",
+            "focal_entity_type": "product",
+            "framing_text": "Opportunity: Potential future indication expansion, though distant."
+        },
+        {
+            "insight_id": 105,
+            "focal_entity_name": "Pfizer",
+            "focal_entity_type": "competitor",
+            "framing_text": "Weakness: Pfizer's metabolic pipeline set back by 18-24 months. Reduces urgency for oral defense strategy."
+        }
+    ],
+    "entities": {
+        "competitors": [
+            { "name": "Novo Nordisk", "id": 1, "tier": "Tier 1" },
+            { "name": "Pfizer", "id": 2, "tier": "Tier 1" },
+            { "name": "Novartis", "id": 3, "tier": "Tier 1" },
+            { "name": "Roche", "id": 4, "tier": "Tier 1" },
+            { "name": "AstraZeneca", "id": 5, "tier": "Tier 1" }
+        ],
+        "products": [
+            { "name": "Mounjaro", "id": 1, "therapeutic_area": "Metabolic", "indication": "Type 2 Diabetes", "phase": "Marketed" },
+            { "name": "Zepbound", "id": 2, "therapeutic_area": "Metabolic", "indication": "Obesity", "phase": "Marketed" },
+            { "name": "Verzenio", "id": 3, "therapeutic_area": "Oncology", "indication": "Breast Cancer", "phase": "Marketed" },
+            { "name": "Taltz", "id": 4, "therapeutic_area": "Immunology", "indication": "Psoriasis", "phase": "Marketed" },
+            { "name": "Jardiance", "id": 5, "therapeutic_area": "Metabolic", "indication": "Diabetes/Heart Failure", "phase": "Marketed" }
+        ]
+    }
+}

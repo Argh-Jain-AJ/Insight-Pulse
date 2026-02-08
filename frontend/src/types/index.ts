@@ -39,6 +39,7 @@ export interface Insight {
     velocity: 'decreasing' | 'stable' | 'increasing' | 'new';
     explanation: string;
     category?: string | null;
+    subjects: string[]; // Phase 12 Step 3
     created_at: string;
 }
 

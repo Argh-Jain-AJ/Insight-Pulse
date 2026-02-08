@@ -27,10 +27,7 @@ def competitor_context_builder(
         if insight.get("scope") in relevant_scopes:
             # Generate Framing
             explanation = insight.get("explanation", "")
-            framing = (
-                f"This affects {competitor_name} because it reflects a change "
-                f"in their competitive environment related to: {explanation}"
-            )
+            framing = f"Strategically relevant shift in the competitive environment for {competitor_name}."
             
             blocks.append({
                 "insight_id": insight.get("id"), # Assumes Insight has ID from DB or upstream
@@ -67,9 +64,7 @@ def product_context_builder(
         if insight.get("scope") in relevant_scopes:
             # Generate Framing
             explanation = insight.get("explanation", "")
-            framing = (
-                f"This impacts {product_name} through market exposure related to: {explanation}"
-            )
+            framing = f"Direct strategic or market exposure impacting {product_name}."
             
             blocks.append({
                 "insight_id": insight.get("id"), 

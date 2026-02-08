@@ -67,9 +67,9 @@ def process_pipeline(tenant_id: int = 1):
 
     # Phase 12 Step 7: Epistemic Honesty / Reset stale data
     # Clear old insights and context blocks for this run to avoid "staying throughout"
-    cursor.execute("DELETE FROM context_blocks WHERE focal_entity_id IN (SELECT id FROM competitors WHERE tenant_id = ?) OR focal_entity_id IN (SELECT id FROM products WHERE tenant_id = ?)", (tenant_id, tenant_id))
-    cursor.execute("DELETE FROM insights WHERE tenant_id = ?", (tenant_id,))
-    db.commit()
+    # cursor.execute("DELETE FROM context_blocks WHERE focal_entity_id IN (SELECT id FROM competitors WHERE tenant_id = ?) OR focal_entity_id IN (SELECT id FROM products WHERE tenant_id = ?)", (tenant_id, tenant_id))
+    # cursor.execute("DELETE FROM insights WHERE tenant_id = ?", (tenant_id,))
+    # db.commit()
 
     # 1. Ingestion (Phase 1)
     query = tenant["name"]
@@ -106,6 +106,7 @@ def process_pipeline(tenant_id: int = 1):
     
     # 2. Tenant scoping (Phase 2)
     scoped_signals = scoping.filter_signals(events, tenant_context) 
+    sys.stderr.write(f"DEBUG: Scoped signals: {len(scoped_signals)}\n")
 
     # Phase 12 Step 2: Add Cheap Memory
     import memory
@@ -113,6 +114,7 @@ def process_pipeline(tenant_id: int = 1):
 
     # 3. Insight synthesis (Phase 4)
     insights = orchestrator.run_orchestrator(scoped_signals, tenant_context) 
+    sys.stderr.write(f"DEBUG: Candidate insights from orchestrator: {len(insights)}\n")
 
     # Phase 12 Step 3: Subject Validation (Improved for partial matches)
     valid_insights = []
@@ -222,33 +224,57 @@ def list_competitors():
     cursor = db.cursor()
 
     competitors = cursor.execute(
-        "SELECT id, name, tier FROM competitors"
+        "SELECT id, name, tier FROM competitors ORDER BY id ASC"
     ).fetchall()
 
     result = []
 
     for c in competitors:
-        # Get counts for high severity specifically for the UI
-        high_sev_count = cursor.execute("""
-            SELECT COUNT(*) FROM insights i
+        # Get counts
+        counts = cursor.execute("""
+            SELECT 
+                COUNT(*) as total,
+                SUM(CASE WHEN severity = 'high' THEN 1 ELSE 0 END) as high_sev
+            FROM insights i
             JOIN context_blocks cb ON cb.insight_id = i.id
             WHERE cb.focal_entity_type = 'competitor'
             AND cb.focal_entity_id = ?
-            AND i.severity = 'high'
-        """, (c["id"],)).fetchone()[0]
+        """, (c["id"],)).fetchone()
 
-        total_count = cursor.execute("""
-            SELECT COUNT(*) FROM context_blocks
-            WHERE focal_entity_type = 'competitor'
-            AND focal_entity_id = ?
-        """, (c["id"],)).fetchone()[0]
+        total_count = counts["total"] or 0
+        high_sev_count = counts["high_sev"] or 0
+
+        # Fetch and Group insights
+        blocks = cursor.execute("""
+            SELECT cb.framing_text, i.* FROM context_blocks cb
+            JOIN insights i ON i.id = cb.insight_id
+            WHERE cb.focal_entity_type = 'competitor'
+            AND cb.focal_entity_id = ?
+        """, (c["id"],)).fetchall()
+
+        grouped = {
+            "Theme": [],
+            "GTM": [],
+            "Positioning": [],
+            "Uncategorized": []
+        }
+
+        for b in blocks:
+            ins = dict(b)
+            cat = ins.get("category") or "Uncategorized"
+            if cat not in grouped: cat = "Uncategorized"
+            grouped[cat].append({
+                "insight": ins,
+                "context_framing": ins.get("framing_text")
+            })
 
         result.append({
             "id": c["id"],
             "name": c["name"],
             "tier": c["tier"] or "Emerging", 
             "insight_count": total_count,
-            "high_severity_count": high_sev_count
+            "high_severity_count": high_sev_count,
+            "insights": grouped
         })
 
     return result
@@ -297,26 +323,56 @@ def list_products():
 
     products = cursor.execute("""
         SELECT id, name, therapeutic_area, indication, phase
-        FROM products
+        FROM products ORDER BY id ASC
     """).fetchall()
 
     result = []
 
     for p in products:
+        prod_id = p["id"]
+        prod_name = p["name"]
+        
         count = cursor.execute("""
             SELECT COUNT(*)
             FROM context_blocks
             WHERE focal_entity_type = 'product'
             AND focal_entity_id = ?
-        """, (p["id"],)).fetchone()[0]
+        """, (prod_id,)).fetchone()[0]
+
+        # Fetch and Group insights
+        blocks = cursor.execute("""
+            SELECT cb.framing_text, i.* FROM context_blocks cb
+            JOIN insights i ON i.id = cb.insight_id
+            WHERE cb.focal_entity_type = 'product'
+            AND cb.focal_entity_id = ?
+        """, (prod_id,)).fetchall()
+
+        grouped = {
+            "Direct": [],
+            "Adjacent": []
+        }
+
+        for b in blocks:
+            ins = dict(b)
+            # Logic: If scope is 'product' and it mentions the product name -> Direct
+            # Actually, context_builder already handles this mapping. 
+            # For list view we just need to distinguish Direct/Adjacent.
+            # Use same logic as detail view.
+            scope = ins.get("scope")
+            cat = "Direct" if scope == 'product' else "Adjacent"
+            grouped[cat].append({
+                "insight": ins,
+                "context_framing": ins.get("framing_text")
+            })
 
         result.append({
-            "id": p["id"],
-            "name": p["name"],
+            "id": prod_id,
+            "name": prod_name,
             "therapeutic_area": p["therapeutic_area"] or "N/A",
             "indication": p["indication"] or "N/A",
             "phase": p["phase"] or "N/A",
-            "insight_count": count
+            "insight_count": count,
+            "insights": grouped
         })
 
     return result

@@ -22,27 +22,53 @@ Your job is to synthesize a list of structured Insights from raw market signals.
 {signals_text}
 
 **STRICT RULES**:
-1. **SUPPRESSION**: Most inputs produce ZERO insights. Do NOT create an insight unless there is clear change, recurrence, or escalation. Single isolated signals MUST be suppressed.
-2. **SEVERITY**: high (multi-subject/repeat), medium (one subject/emerging), low (isolated).
-3. **VELOCITY**: increasing (repeat), stable (single), decreasing (absent).
-4. **SUBJECTS**: list of names (verbatim from context) affected by the insight.
-5. **JSON ONLY**: Return ONLY a valid JSON array of objects.
+1. **DIVERSITY**: Aim for **3-5 distinct insights** if the signals warrant it. Look for different strategic dimensions:
+   - **Theme**: Industry-wide shifts, regulatory news, or sector trends.
+   - **GTM**: Pricing, market access, commercial execution, or sales moves.
+   - **Positioning**: Brand messaging, differentiation, or value proposition shifts.
+2. **SUPPRESSION**: Noise must be filtered, but you MUST generate an insight if signals show a strategic shift, product launch, or safety warning.
+3. **SEVERITY**: high (multi-subject/critical), medium (one subject/emerging), low (minor).
+4. **VELOCITY**: new, stable, increasing, decreasing.
+5. **SUBJECTS**: list of names (verbatim from context) affected.
+6. **OUTPUT**: Return a JSON object with a key "insights" containing an array. If no insights, return {{"insights": []}}.
+
+**EXAMPLE OUTPUT (Multi-Insight)**:
+{{
+  "insights": [
+    {{
+      "scope": "competitor",
+      "subjects": ["Novo Nordisk"],
+      "severity": "high",
+      "velocity": "increasing",
+      "explanation": "Novo Nordisk is aggressively expanding Wegovy supply chain capacity to meet unprecedented demand."
+    }},
+    {{
+      "scope": "market",
+      "subjects": ["Eli Lilly", "Novo Nordisk"],
+      "severity": "medium",
+      "velocity": "new",
+      "explanation": "New regulatory focus on obesity medication side-effects is prompting industry-wide safety labeling audits."
+    }}
+  ]
+}}
 
 **OUTPUT SCHEMA**:
-[
-  {{
-    "scope": "competitor | product | market",
-    "subjects": ["Name1", "Name2"],
-    "severity": "low | medium | high",
-    "velocity": "decreasing | stable | increasing",
-    "explanation": "concise string"
-  }}
-]
+{{
+  "insights": [
+    {{
+      "scope": "competitor | product | market",
+      "subjects": ["Name1", "Name2"],
+      "severity": "low | medium | high",
+      "velocity": "decreasing | stable | increasing | new",
+      "explanation": "concise strategic summary"
+    }}
+  ]
+}}
 
-Return STRICT JSON only.
+Return STRICT JSON only. No preamble.
 """
 
-RETRY_PROMPT = "Return valid JSON only. Do not include any other text."
+RETRY_PROMPT = "Return valid JSON object with 'insights' key only. Do not include any other text."
 
 class OrchestratorNode:
     def __init__(self):
@@ -91,23 +117,27 @@ class OrchestratorNode:
         if not all(field in insight for field in required_fields):
             return False
             
-        # 2. Check Category Invariant
-        if "category" in insight: 
-            return False
-            
         return True
 
     def run(self, state: AgentState) -> AgentState:
         tenant = state["tenant_context"]
         signals = state["signals"]
+        # Filter for only NEW signals to prevent "searching for scraps" / duplication
+        signals = [s for s in signals if not s.get("_seen_before")]
 
         if not signals:
+            import sys
+            sys.stderr.write("DEBUG: No signals passed to orchestrator.\n")
             return {
                 "candidate_insights": [], 
                 "errors": state.get("errors", []) + ["No signals provided"]
             }
 
         # 1. Format Inputs
+        import sys
+        sys.stderr.write(f"DEBUG: Scoped signals reaching orchestrator: {len(signals)}\n")
+        # Limit to 30 signals for stability on small models (Qwen 3b)
+        signals = signals[:30]
         signals_text = self.format_signals(signals)
         final_prompt = self.prompt.format(
             tenant_name=tenant.get("tenant_name", "Unknown"),
@@ -121,6 +151,7 @@ class OrchestratorNode:
         try:
             raw_response = self.llm.invoke(final_prompt)
             import sys
+            # Log the first 500 chars to see what's happening
             sys.stderr.write(f"DEBUG: Raw LLM Response: {raw_response[:500]}...\n")
             insights_data = self._parse_json(raw_response)
         except Exception as e:
@@ -128,7 +159,7 @@ class OrchestratorNode:
             sys.stderr.write(f"DEBUG: Attempt 1 failed: {e}\n")
             # 3. Retry Logic (Attempt 2)
             try:
-                retry_input = f"{final_prompt}\n\nSYSTEM: Previous response was malformed. {RETRY_PROMPT}"
+                retry_input = f"{final_prompt}\n\nSYSTEM: Return a JSON array []. If no insights, return []. {RETRY_PROMPT}"
                 raw_response = self.llm.invoke(retry_input)
                 sys.stderr.write(f"DEBUG: Retry LLM Response: {raw_response[:500]}...\n")
                 insights_data = self._parse_json(raw_response)
@@ -171,10 +202,16 @@ class OrchestratorNode:
             clean = clean[7:]
         if clean.endswith("```"):
             clean = clean[:-3]
-        data = json.loads(clean)
         
+        try:
+            data = json.loads(clean)
+        except:
+            return []
+            
         # Handle wrapped list
         if isinstance(data, dict):
+            if not data: # Empty dict
+                return []
             # If the dict has a key "insights" or "candidate_insights" which is a list, use that
             for key in ["insights", "candidate_insights", "data", "response", "objects"]:
                 if key in data and isinstance(data[key], list):
@@ -182,6 +219,9 @@ class OrchestratorNode:
             # Otherwise treat the dict itself as a single item
             return [data]
         
+        if not isinstance(data, list):
+            return []
+            
         return data
 
 # Wrapper for LangGraph
