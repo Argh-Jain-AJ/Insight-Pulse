@@ -4,6 +4,8 @@
 
 Insight Pulse is an **agentic AI pipeline** that monitors competitor moves, clinical updates, and regulatory shifts. It transforms fragmented market signals into structured, high-fidelity strategic insights categorized by **Theme, GTM, and Positioning**.
 
+### 📺 [**Watch the Demo Video**](https://plakshauniversity1-my.sharepoint.com/:v:/g/personal/vibhav_sahu_ug24_plaksha_edu_in/IQA_dYT81YFwSaHV-OKDyZgvAYUpb2FtFH7Pg6RTFqycWpg?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=600O2l)
+
 ---
 
 ## 🌟 Choose Your Mode
